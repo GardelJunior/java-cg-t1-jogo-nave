@@ -16,6 +16,8 @@ public class Texture {
 
 	private int texture;
 	
+	private static int current_bind = 0;
+	
 	private int width, height;
 	public static final float pxFactor = 1.0f / 512.0f;
 	public static final float pxFactor2 = 1.0f / 1024.0f;
@@ -71,10 +73,16 @@ public class Texture {
 	}
 
 	public void bind() {
-		glBindTexture(GL_TEXTURE_2D, texture);
+		if(current_bind != texture) {
+			glBindTexture(GL_TEXTURE_2D, texture);
+			current_bind = texture;
+		}
 	}
 
-	public void unbind() {
-		glBindTexture(GL_TEXTURE_2D, 0);
+	public static void unbind() {
+		if(current_bind != 0) {
+			current_bind = 0;
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
 	}
 }

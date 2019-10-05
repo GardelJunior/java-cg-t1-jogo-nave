@@ -11,11 +11,14 @@ import com.gardel.jogo.events.EventoRemoveForma;
 import com.gardel.jogo.events.IKeyListener;
 import com.gardel.jogo.formas.Asteroide;
 import com.gardel.jogo.formas.Chefao;
+import com.gardel.jogo.formas.EndGameVictory;
 import com.gardel.jogo.formas.Estrelas;
 import com.gardel.jogo.formas.IForma;
 import com.gardel.jogo.formas.Jogador;
 import com.gardel.jogo.formas.MissilChefao;
 import com.gardel.jogo.formas.NaveInimiga;
+import com.gardel.jogo.math.Mathf;
+import com.gardel.jogo.renderer.Layer;
 import com.gardel.jogo.texture.Texture;
 
 @SuppressWarnings("unused")
@@ -29,23 +32,19 @@ public class EntityManager extends Observable implements IKeyListener{
 		return instance;
 	}
 	
-	private Texture[] textures = new Texture[2];
-	
 	private Estrelas estrelas; //Campo de estrelas do jogo
 	private Jogador jogador;
 	private Chefao chefao;
 	
-	private HashMap<Integer,Vector<IForma>> formas = new HashMap<Integer,Vector<IForma>>();
-	private Vector<Collidable> collidables = new Vector<>();
+	private Vector<Layer> layers = new Vector<Layer>();
+	private Vector<Integer> layers_z = new Vector<Integer>();
+	private Vector<Collidable> collidables = new Vector<Collidable>();
+	
+	private boolean outro = false;
+	private int outro_time = 740;
 	
 	private EntityManager() { 
 		super();
-		
-		formas.put(0, new Vector<IForma>());
-		formas.put(1, new Vector<IForma>());
-		
-		textures[0] = TextureManager.getInstance().getTexture("sprite_sheet");
-		textures[1] = TextureManager.getInstance().getTexture("boss_sheet");
 		
 		estrelas = new Estrelas(Jogo.WIDTH,Jogo.HEIGHT); //Inicia o campo de estrelas
 		jogador = new Jogador(Jogo.WIDTH/2,Jogo.HEIGHT * 0.9f);
@@ -55,42 +54,72 @@ public class EntityManager extends Observable implements IKeyListener{
 		add(jogador);
 		add(new NaveInimiga(Jogo.WIDTH/4, Jogo.HEIGHT/2));
 		add(new Asteroide(Jogo.WIDTH/2, Jogo.HEIGHT/2));
-		add(new MissilChefao(Jogo.WIDTH/2 + Jogo.WIDTH/4, Jogo.HEIGHT/2));
-		
 		add(new Chefao(Jogo.WIDTH/2, Jogo.HEIGHT/5));
-		
 	}
 	
 	public void add(IForma forma) {
-		formas.get(forma.getTextureSheet()).add(forma);
+		if(!layers_z.contains(forma.getDepth())) {
+			layers_z.add(forma.getDepth());
+			layers.add(new Layer());
+			zOrderLayers();
+		}
+		
+		layers.get(layers_z.indexOf(forma.getDepth())).add(forma);
 		if(forma instanceof Collidable) collidables.add((Collidable)forma);
+		
 		setChanged();
 		notifyObservers(new EventoAdicionaForma(forma));
 	}
 	
 	public boolean remove(IForma forma) {
-		if(forma instanceof Collidable) collidables.remove((Collidable)forma);
-		setChanged();
-		notifyObservers(new EventoRemoveForma(forma));
-		return formas.get(forma.getTextureSheet()).remove(forma);
+		
+		if(forma instanceof Chefao) {
+			estrelas.setVelocity(1);
+			outro = true;
+		}
+		
+		if(layers_z.contains(forma.getDepth())) {
+			int layer_z = layers_z.indexOf(forma.getDepth());
+			if(forma instanceof Collidable) collidables.remove((Collidable) forma);
+			setChanged();
+			notifyObservers(new EventoRemoveForma(forma));
+			return layers.get(layer_z).remove(forma);
+		}
+		
+		return false;
+	}
+	
+	private void zOrderLayers() {
+		layers.sort((Layer l1, Layer l2) -> Integer.compare(l1.getZ_order(), l2.getZ_order()));
+		layers_z.sort((Integer z1, Integer z2) -> Integer.compare(z1, z2));
 	}
 	
 	public void update() {
 		checkCollison();
 	}
 	
+	public Jogador getJogador() {
+		return jogador;
+	}
+	
 	public void render() {
+		if(outro && outro_time > 0) {
+			estrelas.setVelocity(Mathf.min(estrelas.getVelocity() * 1.01f, 40));
+			jogador.setyScale(Mathf.min(jogador.getyScale() * 1.001f, 3));
+			outro_time--;
+		}else if(outro_time == 0) {
+			outro_time = -1;
+			jogador.setyScale(1);
+			estrelas.setVelocity(0);
+			add(new EndGameVictory(Jogo.WIDTH/2, Jogo.HEIGHT/2));
+		}
+		
 		estrelas.update(); //Atualiza o campo de estrelas
 		estrelas.render(); //Desenha o camp de estrelas
 		
-		for(int t = 0 ; t < textures.length ; t++) {
-			textures[t].bind();
-			Vector<IForma> forms = formas.get(t);
-			for(int i = 0 ; i < forms.size() ; i++) { //Percorre todas as formas
-				forms.get(i).update().render();
-			}
+		for(int i = 0 ; i < layers.size() ; i++) {
+			layers.get(i).render();
 		}
-		textures[0].unbind();
 	}
 
 	public void onKeyEvent(int key, int action) {

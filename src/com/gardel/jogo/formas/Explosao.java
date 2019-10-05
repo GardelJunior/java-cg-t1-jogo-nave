@@ -22,9 +22,18 @@ public class Explosao implements IForma {
 	
 	private float frame = 0;
 	
+	private float scale = 1;
+	
 	public Explosao(float x, float y) {
 		this.x = x;
 		this.y = y;
+		this.rotation = (float) (Math.random() * 360);
+	}
+	
+	public Explosao(float x, float y, float s) {
+		this.x = x;
+		this.y = y;
+		this.scale = s;
 		this.rotation = (float) (Math.random() * 360);
 	}
 	
@@ -35,6 +44,7 @@ public class Explosao implements IForma {
 		glPushMatrix();
 			glTranslatef(x, y, 0);
 			glRotatef(rotation, 0, 0, 1);
+			glScalef(scale, scale, 1);
 			glBegin(GL_QUADS);
 				glTexCoord2f(txPos, sH);
 				glVertex2f(-SIZE,  SIZE);
@@ -57,5 +67,10 @@ public class Explosao implements IForma {
 			EntityManager.getInstance().remove(this); //Remove do jogo
 		}
 		return this;
+	}
+
+	@Override
+	public int getDepth() {
+		return 1;
 	}
 }

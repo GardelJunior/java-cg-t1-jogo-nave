@@ -74,8 +74,6 @@ public class LaserPlayer extends Collidable implements IForma{
 			EntityManager.getInstance().remove((IForma)c);
 			EntityManager.getInstance().remove(this);
 			EntityManager.getInstance().add(new Explosao(c.getX(), c.getY()));
-		} else if(c instanceof EsferaChefao) {
-			//TODO: Checar invencibilidade e diminuir vida do chefao
 		}
 	}
 }

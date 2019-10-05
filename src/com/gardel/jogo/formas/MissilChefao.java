@@ -2,7 +2,10 @@ package com.gardel.jogo.formas;
 
 import static org.lwjgl.opengl.GL11.*;
 
+import com.gardel.Jogo;
 import com.gardel.jogo.collision.Collidable;
+import com.gardel.jogo.manager.EntityManager;
+import com.gardel.jogo.math.Mathf;
 import com.gardel.jogo.texture.Texture;
 
 public class MissilChefao extends Collidable implements IForma {
@@ -17,9 +20,11 @@ public class MissilChefao extends Collidable implements IForma {
 	
 	private float frame = 0;
 	
-	public MissilChefao(float x, float y) {
+	public MissilChefao(float x, float y, float angle) {
+		setRaio(10);
 		this.x = x;
 		this.y = y;
+		this.angle = angle;
 	}
 	
 	@Override
@@ -50,6 +55,13 @@ public class MissilChefao extends Collidable implements IForma {
 		
 		if(frame >= MAX_FRAMES) {
 			frame = 0;
+		}
+		
+		x += Mathf.lengthdir_x(8, angle + 270);
+		y += Mathf.lengthdir_y(8, angle + 270);
+		
+		if(y + 10 > Jogo.HEIGHT) {
+			EntityManager.getInstance().remove(this);
 		}
 		
 		return this;

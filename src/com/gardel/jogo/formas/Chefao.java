@@ -3,6 +3,8 @@ package com.gardel.jogo.formas;
 import static org.lwjgl.opengl.GL11.*;
 
 import com.gardel.jogo.collision.Collidable;
+import com.gardel.jogo.manager.EntityManager;
+import com.gardel.jogo.math.Mathf;
 import com.gardel.jogo.texture.Texture;
 
 public class Chefao extends Collidable implements IForma {
@@ -14,9 +16,21 @@ public class Chefao extends Collidable implements IForma {
 
 	private static final int SIZE = 186;
 	
+	private final int attackFrame = 13, endAttackFrame = 28;
+	
+	private int vida = 22;
+	
 	private float frame = 0;
+	private int attackDelay = 0;
+	
+	private float speed = 6;
 	
 	private EsferaChefao esferaEsq,esferaDir;
+	
+	private int deathAnimation = 240;
+	private boolean dead = false;
+	
+	private float shake = 0;
 	
 	public Chefao(float x, float y) {
 		this.x = x;
@@ -29,9 +43,10 @@ public class Chefao extends Collidable implements IForma {
 	public IForma render() {
 		float txPos = tW * ((int)(frame) % 8 );
 		float tyPos = tH * ((int)(frame) / 8 );
+		int rAng = Mathf.randomInRangei(0, 360);
 		glColor3f(1, 1, 1);
 		glPushMatrix();
-			glTranslatef(x, y, 0);
+			glTranslatef(x + Mathf.lengthdir_x(shake, rAng), y + Mathf.lengthdir_y(shake, rAng), 0);
 			glBegin(GL_QUADS);
 			glTexCoord2f(txPos + tW,tyPos + tH);
 				glVertex2f(-SIZE,  SIZE);
@@ -51,10 +66,46 @@ public class Chefao extends Collidable implements IForma {
 	}
 
 	public IForma update() {
-		frame += 6.0/60.0;
+		frame += speed/60.0;
 		if(frame >= MAX_FRAMES) {
 			frame = 0;
 		}
+		shake *= 0.9f;
+		if(frame >= attackFrame && frame <= endAttackFrame) {
+			if(attackDelay == 0) {
+				attackDelay = (vida > 10)? 45 : 15;
+				Jogador j = EntityManager.getInstance().getJogador();
+				int angle = Mathf.angle_between_points(x, y + 90, j.getX(), j.getY());
+				EntityManager.getInstance().add(new MissilChefao(x, y + 90,angle + 90));
+			}else {
+				attackDelay--;
+			}
+		}else {
+			if(attackDelay > 0) attackDelay = 0;
+		}
+		
+		if(vida == 0 && !dead) {
+			frame = 0;
+			speed = 0;
+			dead = true;
+		}
+		
+		if(dead && deathAnimation > 0) {
+			if(deathAnimation % 30 == 0) {
+				int randomAngle = Mathf.randomInRangei(0, 360);
+				float distance = Mathf.randomInRangef(20, 100);
+				float dx = x + Mathf.lengthdir_x(distance, randomAngle);
+				float dy = y + Mathf.lengthdir_y(distance, randomAngle);
+				shake = 6;
+				EntityManager.getInstance().add(new Explosao(dx, dy,1.4f));
+			}
+			deathAnimation--;
+			if(deathAnimation == 0) {
+				EntityManager.getInstance().add(new Explosao(x, y,6));
+				EntityManager.getInstance().remove(this);
+			}
+		}
+		
 		esferaEsq.update();
 		esferaDir.update();
 		return this;
@@ -89,5 +140,20 @@ public class Chefao extends Collidable implements IForma {
 		return esferaDir.isColliding(collidable) || esferaEsq.isColliding(collidable);
 	}
 	
-	
+	@Override
+	public void onCollideWith(Collidable c) {
+		if(c.isColliding(esferaDir)) {
+			esferaDir.onCollideWith(c);
+		}else {
+			esferaEsq.onCollideWith(c);
+		}
+	}
+
+	public int getVida() {
+		return vida;
+	}
+
+	public void setVida(int vida) {
+		this.vida = vida;
+	}
 }
