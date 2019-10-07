@@ -12,6 +12,7 @@ import com.gardel.jogo.collision.Collidable;
 import com.gardel.jogo.events.EventoRemoveForma;
 import com.gardel.jogo.events.IKeyListener;
 import com.gardel.jogo.manager.EntityManager;
+import com.gardel.jogo.sound.SoundManager;
 
 public class Jogador extends Collidable implements IForma,IKeyListener,Observer{
 	
@@ -65,6 +66,7 @@ public class Jogador extends Collidable implements IForma,IKeyListener,Observer{
 		}else if(space > 0 && shoot_delay <= 0f && available_shoots > 0) {
 			available_shoots--;
 			shoot_delay = 60;
+			SoundManager.SOUND_LASER.play();
 			EntityManager.getInstance().add(new LaserPlayer(x, y - 20));
 		}
 		return this;
@@ -99,10 +101,11 @@ public class Jogador extends Collidable implements IForma,IKeyListener,Observer{
 	
 	@Override
 	public void onCollideWith(Collidable c) {
-		if(c instanceof MissilChefao) {
+		if(c instanceof MissilChefao || c instanceof LaserInimigo) {
 			EntityManager.getInstance().remove(this);
 			EntityManager.getInstance().remove((IForma)c);
 			EntityManager.getInstance().add(new Explosao(x, y));
+			SoundManager.SOUND_EXPLOSION_P.play();
 		}
 	}
 

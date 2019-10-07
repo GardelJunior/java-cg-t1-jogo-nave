@@ -4,6 +4,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 import com.gardel.jogo.collision.Collidable;
 import com.gardel.jogo.manager.EntityManager;
+import com.gardel.jogo.sound.SoundManager;
 import com.gardel.jogo.texture.Texture;
 
 public class LaserPlayer extends Collidable implements IForma{
@@ -69,11 +70,17 @@ public class LaserPlayer extends Collidable implements IForma{
 		this.y = y;
 	}
 
+	@Override
+	public int getDepth() {
+		return 1;
+	}
+
 	public void onCollideWith(Collidable c) {
 		if(c instanceof Asteroide || c instanceof NaveInimiga) {
 			EntityManager.getInstance().remove((IForma)c);
 			EntityManager.getInstance().remove(this);
 			EntityManager.getInstance().add(new Explosao(c.getX(), c.getY()));
+			SoundManager.SOUND_EXPLOSION_2.play();
 		}
 	}
 }

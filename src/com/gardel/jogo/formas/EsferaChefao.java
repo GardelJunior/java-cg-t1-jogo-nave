@@ -5,6 +5,7 @@ import static org.lwjgl.opengl.GL11.*;
 import com.gardel.jogo.collision.Collidable;
 import com.gardel.jogo.manager.EntityManager;
 import com.gardel.jogo.math.Mathf;
+import com.gardel.jogo.sound.SoundManager;
 import com.gardel.jogo.texture.Texture;
 
 public class EsferaChefao extends Collidable implements IForma {
@@ -16,11 +17,8 @@ public class EsferaChefao extends Collidable implements IForma {
 	private static final int SIZE = 48;
 	
 	private float vida = 10;
-	
 	private float speed = 6;
-	
 	private float xScale = 1;
-	
 	private float frame = 0;
 	
 	private int deathAnimation = 240;
@@ -89,15 +87,17 @@ public class EsferaChefao extends Collidable implements IForma {
 				float distance = Mathf.randomInRangef(0, 20);
 				float dx = x + Mathf.lengthdir_x(distance, randomAngle);
 				float dy = y + Mathf.lengthdir_y(distance, randomAngle);
-				shake = 6;
 				EntityManager.getInstance().add(new Explosao(dx, dy,0.6f));
+				SoundManager.SOUND_EXPLOSION_1.play();
+				shake = 6;
 			}
 			
 			deathAnimation--;
 			
 			if(deathAnimation == 0) {
 				EntityManager.getInstance().add(new Explosao(x, y,2));
-				chefao.setVida(chefao.getVida()-1);
+				SoundManager.SOUND_EXPLOSION_2.play();
+				chefao.nextForm();
 			}
 		}
 		
@@ -112,8 +112,11 @@ public class EsferaChefao extends Collidable implements IForma {
 				destruida = true;
 			}else if(!destruida){
 				vida--;
-				chefao.setVida(chefao.getVida()-1);
+				chefao.removerVida();
 				shake = 4;
+				SoundManager.SOUND_HIT.setPitch(1 + (1 - vida/10.0f));
+				SoundManager.SOUND_HIT.play();
+				SoundManager.SOUND_HIT.setPitch(1);
 				EntityManager.getInstance().remove((IForma)c);
 			}
 		}

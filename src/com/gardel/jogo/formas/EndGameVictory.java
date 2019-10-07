@@ -8,13 +8,14 @@ public class EndGameVictory implements IForma {
 
 	private float x,y;
 	
+	private static final int SIZE = 120;
+	
 	private static final float tX = 0;
 	private static final float tY = 128 * Texture.pxFactor;
 	
 	private static final float sW = tX + 64 * Texture.pxFactor;
 	private static final float sH = tY + 64 * Texture.pxFactor;
 	
-	private static final int SIZE = 120;
 	
 	private float visible = 0;
 	

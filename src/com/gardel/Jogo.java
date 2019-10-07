@@ -8,6 +8,8 @@ import org.lwjgl.opengl.GL;
 
 import com.gardel.jogo.manager.EntityManager;
 import com.gardel.jogo.manager.TextureManager;
+import com.gardel.jogo.sound.SoundManager;
+import com.gardel.jogo.sound.SoundSource;
 
 public class Jogo {
 	
@@ -31,6 +33,15 @@ public class Jogo {
 		
 		TextureManager.getInstance().loadTexture("sprite_sheet", "/sprite_sheet.png");
 		TextureManager.getInstance().loadTexture("boss_sheet", "/boss_sheet.png");
+		
+		SoundManager.SOUND_EXPLOSION_1 	= new SoundSource(SoundManager.loadWaveSound("/explosion.wav"));
+		SoundManager.SOUND_EXPLOSION_2 	= new SoundSource(SoundManager.loadWaveSound("/explosion2.wav"));
+		SoundManager.SOUND_EXPLOSION_P 	= new SoundSource(SoundManager.loadWaveSound("/explosion_player.wav"));
+		SoundManager.SOUND_EXPLOSION_BIG 	= new SoundSource(SoundManager.loadWaveSound("/explosion_big.wav"));
+		SoundManager.SOUND_HIT				= new SoundSource(SoundManager.loadWaveSound("/hit.wav"));
+		SoundManager.SOUND_LASER			= new SoundSource(SoundManager.loadWaveSound("/laser.wav"));
+		SoundManager.SOUND_ATTACK			= new SoundSource(SoundManager.loadWaveSound("/attack.wav"));
+		
 		em = EntityManager.getInstance();
 	}
 	
@@ -69,6 +80,9 @@ public class Jogo {
 		
 		Jogo jogo = new Jogo();
 		
+		SoundManager.init();
+		SoundManager.setListenerConfiguration();
+		
 		glfwInit();
 		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 		Jogo.janela = glfwCreateWindow(600, 800, "Jogo de Naves", 0, 0);
@@ -82,6 +96,7 @@ public class Jogo {
 		jogo.init();
 		jogo.gameloop();
 		
+		SoundManager.terminate();
 		glfwTerminate();
 	}
 }

@@ -10,6 +10,7 @@ import com.gardel.jogo.events.EventoAdicionaForma;
 import com.gardel.jogo.events.EventoRemoveForma;
 import com.gardel.jogo.events.IKeyListener;
 import com.gardel.jogo.formas.Asteroide;
+import com.gardel.jogo.formas.BarraVida;
 import com.gardel.jogo.formas.Chefao;
 import com.gardel.jogo.formas.EndGameVictory;
 import com.gardel.jogo.formas.Estrelas;
@@ -35,13 +36,14 @@ public class EntityManager extends Observable implements IKeyListener{
 	private Estrelas estrelas; //Campo de estrelas do jogo
 	private Jogador jogador;
 	private Chefao chefao;
+	private BarraVida vida_chefao;
 	
 	private Vector<Layer> layers = new Vector<Layer>();
 	private Vector<Integer> layers_z = new Vector<Integer>();
 	private Vector<Collidable> collidables = new Vector<Collidable>();
 	
 	private boolean outro = false;
-	private int outro_time = 740;
+	private int outro_time = 220;
 	
 	private EntityManager() { 
 		super();
@@ -51,10 +53,12 @@ public class EntityManager extends Observable implements IKeyListener{
 		
 		addObserver(jogador);
 		
+		this.vida_chefao = new BarraVida(Jogo.WIDTH/2, 30, 30, 30);
+		this.chefao = new Chefao(Jogo.WIDTH/2, Jogo.HEIGHT/5,this.vida_chefao);
+		
 		add(jogador);
-		add(new NaveInimiga(Jogo.WIDTH/4, Jogo.HEIGHT/2));
-		add(new Asteroide(Jogo.WIDTH/2, Jogo.HEIGHT/2));
-		add(new Chefao(Jogo.WIDTH/2, Jogo.HEIGHT/5));
+		add(chefao);
+		add(vida_chefao);
 	}
 	
 	public void add(IForma forma) {
@@ -104,8 +108,9 @@ public class EntityManager extends Observable implements IKeyListener{
 	
 	public void render() {
 		if(outro && outro_time > 0) {
-			estrelas.setVelocity(Mathf.min(estrelas.getVelocity() * 1.01f, 40));
+			estrelas.setVelocity(Mathf.min(estrelas.getVelocity() * 1.05f, 50));
 			jogador.setyScale(Mathf.min(jogador.getyScale() * 1.001f, 3));
+			jogador.setX(Mathf.lerp(jogador.getX(), Jogo.WIDTH/2, 0.1f));
 			outro_time--;
 		}else if(outro_time == 0) {
 			outro_time = -1;

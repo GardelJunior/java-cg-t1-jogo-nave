@@ -71,6 +71,6 @@ public class Explosao implements IForma {
 
 	@Override
 	public int getDepth() {
-		return 1;
+		return 2;
 	}
 }

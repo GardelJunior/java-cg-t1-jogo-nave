@@ -49,13 +49,6 @@ public class Estrelas {
 	public void render() {
 		Texture.unbind();
 		
-		glColor3f(1, 1, 1);
-		glBegin(GL_POINTS);
-			for(int i = 0 ; i < SIZE ; i++) {
-				glVertex2f(pontos[i][0], pontos[i][1]);
-			}
-		glEnd();
-		glColor3f(1, 1, 1);
 		if(velocity>0) {
 			glBegin(GL_LINES);
 			for(int i = 0 ; i < SIZE ; i++) {
@@ -63,6 +56,13 @@ public class Estrelas {
 				glVertex2f(pontos[i][0], pontos[i][1] - velocity);
 				glVertex2f(pontos[i][0], pontos[i][1]);
 			}
+			glEnd();
+		}else {
+			glColor3f(1, 1, 1);
+			glBegin(GL_POINTS);
+				for(int i = 0 ; i < SIZE ; i++) {
+					glVertex2f(pontos[i][0], pontos[i][1]);
+				}
 			glEnd();
 		}
 	}
@@ -72,8 +72,6 @@ public class Estrelas {
 	}
 
 	public void setVelocity(float velocity) {
-		if(velocity <= 30) {
-			this.velocity = velocity;
-		}
+		this.velocity = velocity;
 	}
 }

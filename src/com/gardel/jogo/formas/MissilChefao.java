@@ -20,6 +20,8 @@ public class MissilChefao extends Collidable implements IForma {
 	
 	private float frame = 0;
 	
+	private float alpha = 0;
+	
 	public MissilChefao(float x, float y, float angle) {
 		setRaio(10);
 		this.x = x;
@@ -30,7 +32,7 @@ public class MissilChefao extends Collidable implements IForma {
 	@Override
 	public IForma render() {
 		float txPos = tW * (int)(frame);
-		glColor3f(1, 1, 1);
+		glColor4f(1, 1, 1,alpha);
 		glPushMatrix();
 			glTranslatef(x, y, 0);
 			glRotatef(-angle, 0, 0, 1);
@@ -53,6 +55,11 @@ public class MissilChefao extends Collidable implements IForma {
 		
 		frame += 6.0f/12.0;
 		
+		if(alpha<1) {
+			if(alpha==0) alpha = 0.01f;
+			alpha *= 2.5f;
+		}
+		
 		if(frame >= MAX_FRAMES) {
 			frame = 0;
 		}
@@ -60,7 +67,7 @@ public class MissilChefao extends Collidable implements IForma {
 		x += Mathf.lengthdir_x(8, angle + 270);
 		y += Mathf.lengthdir_y(8, angle + 270);
 		
-		if(y + 10 > Jogo.HEIGHT) {
+		if(y - 40 > Jogo.HEIGHT) {
 			EntityManager.getInstance().remove(this);
 		}
 		
