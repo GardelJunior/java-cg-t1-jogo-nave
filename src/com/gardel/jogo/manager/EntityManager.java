@@ -188,7 +188,7 @@ public class EntityManager extends Observable implements IKeyListener {
 					spawn_interval--;
 				}
 			}
-		} else if (game_time == 0) {
+		} else if (game_time == 0 && shouldSpawn) {
 			if (enemy_on_screen == 0) {
 				game_time = -1;
 				SoundManager.MUSIC_1.stop();
