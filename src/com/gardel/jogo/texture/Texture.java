@@ -23,7 +23,7 @@ public class Texture {
 	public static final float pxFactor2 = 1.0f / 1024.0f;
 	
 	public static final float SIZE_32 = pxFactor * 32;
-
+	
 	public Texture(String file) {
 		try {
 			glEnable(GL_TEXTURE_2D);

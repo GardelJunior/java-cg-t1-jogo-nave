@@ -8,8 +8,8 @@ import com.gardel.jogo.texture.Texture;
 
 public class Estrelas {
 	private final int SIZE = 100;
-	private float [][] pontos = new float[SIZE][6]; //100 Estrelas
-	private float velocity = 0;
+	private Estrela[] pontos = new Estrela[SIZE]; //100 Estrelas
+	private float velocity = 1;
 	Random randomizer;
 	public float width,height;
 	
@@ -18,29 +18,33 @@ public class Estrelas {
 		this.height = height;
 		randomizer = new Random();
 		for(int i = 0 ; i < SIZE ; i++) {
-			pontos[i] = new float[] {
-					randomizer.nextFloat() * width, 
-					randomizer.nextFloat() * height,
-					1.0f ,
-					1.0f ,
-					1.0f ,
-					.4f + randomizer.nextFloat()*1.5f
-			};
+			pontos[i] = new Estrela(
+					randomizer.nextFloat() * width, 	//X
+					randomizer.nextFloat() * height, 	//Y
+					1, //R
+					1, //G
+					1, //B
+					.4f + randomizer.nextFloat()*1.5f); //Size Y
 		}
-		System.gc();
 	}
 	
 	public void update() {
 		for(int i = 0 ; i < SIZE ; i++) {
-			pontos[i][1] += pontos[i][2] + velocity;
-			if(pontos[i][1] > height + velocity) {
-				pontos[i][0] = randomizer.nextFloat() * width;
-				pontos[i][1] = 0;
-				pontos[i][5] = .4f + randomizer.nextFloat()*1.4f;
-				if(velocity>25) {
-					pontos[i][2] = (float) Math.random();
-					pontos[i][3] = (float) Math.random();
-					pontos[i][4] = (float) Math.random();
+			pontos[i].y += pontos[i].yVel * velocity;
+			boolean pA = pontos[i].y > height + velocity;
+			boolean pB = pontos[i].y - velocity < 0;
+			if( pA || pB ) {
+				pontos[i].x = randomizer.nextFloat() * width;
+				if(pA) {
+					pontos[i].y = 0;
+				}else {
+					pontos[i].y = height;
+				}
+				pontos[i].yVel = (.4f + randomizer.nextFloat()*1.4f);
+				if(velocity > 25f || velocity < -25f) {
+					pontos[i].r = (float) Math.random();
+					pontos[i].g = (float) Math.random();
+					pontos[i].b = (float) Math.random();
 				}
 			}
 		}
@@ -48,20 +52,19 @@ public class Estrelas {
 	
 	public void render() {
 		Texture.unbind();
-		
-		if(velocity>0) {
+		if(velocity > 1f || velocity < -1f) {
 			glBegin(GL_LINES);
 			for(int i = 0 ; i < SIZE ; i++) {
-				glColor3f(pontos[i][2], pontos[i][3], pontos[i][4]);
-				glVertex2f(pontos[i][0], pontos[i][1] - velocity);
-				glVertex2f(pontos[i][0], pontos[i][1]);
+				glColor3f(pontos[i].r, pontos[i].g, pontos[i].b);
+				glVertex2f(pontos[i].x, pontos[i].y - velocity);
+				glVertex2f(pontos[i].x, pontos[i].y);
 			}
 			glEnd();
 		}else {
 			glColor3f(1, 1, 1);
 			glBegin(GL_POINTS);
 				for(int i = 0 ; i < SIZE ; i++) {
-					glVertex2f(pontos[i][0], pontos[i][1]);
+					glVertex2f(pontos[i].x, pontos[i].y);
 				}
 			glEnd();
 		}
@@ -73,5 +76,20 @@ public class Estrelas {
 
 	public void setVelocity(float velocity) {
 		this.velocity = velocity;
+	}
+	
+	private class Estrela {
+		public float x,y;
+		public float r,g,b;
+		public float yVel;
+		
+		public Estrela(float x, float y, float r, float g, float b, float yVel) {
+			this.x = x;
+			this.y = y;
+			this.r = r;
+			this.g = g;
+			this.b = b;
+			this.yVel = yVel;
+		}
 	}
 }

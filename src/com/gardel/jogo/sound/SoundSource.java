@@ -21,8 +21,16 @@ public class SoundSource {
 		AL10.alSourcei(sourceID, AL10.AL_BUFFER, soundid);
 	}
 	
+	public void stop() {
+		AL10.alSourceStop(sourceID);
+	}
+	
 	public void setVolume(float volume) {
 		AL10.alSourcef(sourceID, AL10.AL_GAIN, volume);
+	}
+	
+	public void setLoop(boolean loop) {
+		AL10.alSourcef(sourceID, AL10.AL_LOOPING, loop? AL10.AL_TRUE : AL10.AL_FALSE);
 	}
 	
 	public void setPitch(float pitch) {

@@ -165,4 +165,12 @@ public class Mathf {
 			return val;
 		}
 	}
+	
+	public static float randomVal(float ...fs) {
+		return fs[randomic.nextInt(fs.length)];
+	}
+	
+	public static int randomVal(int ...fs) {
+		return fs[randomic.nextInt(fs.length)];
+	}
 }

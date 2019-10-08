@@ -2,13 +2,14 @@ package com.gardel.jogo.formas;
 
 import static org.lwjgl.opengl.GL11.*;
 
+import com.gardel.Jogo;
 import com.gardel.jogo.collision.Collidable;
 import com.gardel.jogo.manager.EntityManager;
 import com.gardel.jogo.math.Mathf;
 import com.gardel.jogo.sound.SoundManager;
 import com.gardel.jogo.texture.Texture;
 
-public class Chefao extends Collidable implements IForma {
+public class ChefaoCorpo extends Collidable implements IForma {
 
 	private static final float tW = 128 * Texture.pxFactor2;
 	private static final float tH = 160 * Texture.pxFactor2;
@@ -23,11 +24,13 @@ public class Chefao extends Collidable implements IForma {
 	
 	private float frame = 0;
 	private int form = 3;
-	private float speed = 6;
+	private float speed = 0;
 	private int attackDelay = 0;
 	private int attackMode = 0;
 	
-	private EsferaChefao esferaEsq,esferaDir;
+	private boolean invencible = true;
+	
+	private ChefaoEsfera esferaEsq,esferaDir;
 	private BarraVida barravida;
 	
 	private int deathAnimation = 240;
@@ -35,12 +38,13 @@ public class Chefao extends Collidable implements IForma {
 	
 	private float shake = 0;
 	
-	public Chefao(float x, float y, BarraVida barravida) {
+	public ChefaoCorpo(float x, float y) {
 		this.x = x;
 		this.y = y;
-		this.esferaEsq = new EsferaChefao(this, true);
-		this.esferaDir = new EsferaChefao(this, false);
-		this.barravida = barravida;
+		this.esferaEsq = new ChefaoEsfera(this, true);
+		this.esferaDir = new ChefaoEsfera(this, false);
+		this.barravida = new BarraVida(Jogo.WIDTH/2, 30, 30, vida);
+		EntityManager.getInstance().add(barravida);
 		setRaio(40);
 	}
 	
@@ -71,6 +75,17 @@ public class Chefao extends Collidable implements IForma {
 	}
 
 	public IForma update() {
+		if(invencible) {
+			if(y < Jogo.HEIGHT/5) {
+				y++;
+				shake = 1f;
+			}else {
+				invencible = false;
+				speed = 6;
+				barravida.setVisible(true);
+			}
+		}
+		
 		frame += speed/60.0;
 		if(frame >= MAX_FRAMES) {
 			frame = 0;
@@ -110,6 +125,8 @@ public class Chefao extends Collidable implements IForma {
 			frame = 0;
 			speed = 0;
 			dead = true;
+			SoundManager.MUSIC_2.stop();
+			SoundManager.MUSIC_3.play();
 			barravida.setVisible(false);
 		}
 		
@@ -168,23 +185,29 @@ public class Chefao extends Collidable implements IForma {
 	public boolean isColliding(Collidable collidable) {
 		return esferaDir.isColliding(collidable) || 
 				esferaEsq.isColliding(collidable) || 
-				(super.isColliding(collidable) && esferaDir.destruida && esferaEsq.destruida);
+				super.isColliding(collidable);
 	}
 	
 	@Override
 	public void onCollideWith(Collidable c) {
+		if(invencible) return;
 		if(c.isColliding(esferaDir)) {
 			esferaDir.onCollideWith(c);
 		}else if(c.isColliding(esferaEsq)){
 			esferaEsq.onCollideWith(c);
 		}else {
-			if(frame >= attackFrame && frame <= endAttackFrame && vida>0) {
-				shake = 3;
-				SoundManager.SOUND_HIT.play();
+			if(!esferaEsq.destruida || !esferaDir.destruida) {
 				EntityManager.getInstance().remove((IForma)c);
-				removerVida();
+				EntityManager.getInstance().add(new ChefaoEscudo(x, y,3));
 			}else {
-				EntityManager.getInstance().remove((IForma)c);
+				if(frame >= attackFrame && frame <= endAttackFrame && vida>0) {
+					shake = 3;
+					SoundManager.SOUND_HIT.play();
+					EntityManager.getInstance().remove((IForma)c);
+					removerVida();
+				}else {
+					EntityManager.getInstance().remove((IForma)c);
+				}
 			}
 		}
 	}

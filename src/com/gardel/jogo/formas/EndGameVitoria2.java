@@ -4,14 +4,14 @@ import static org.lwjgl.opengl.GL11.*;
 
 import com.gardel.jogo.texture.Texture;
 
-public class EndGameVictory implements IForma {
+public class EndGameVitoria2 implements IForma {
 
 	private float x,y;
 	
 	private static final int SIZE = 120;
 	
 	private static final float tX = 0;
-	private static final float tY = 128 * Texture.pxFactor;
+	private static final float tY = 258 * Texture.pxFactor;
 	
 	private static final float sW = tX + 64 * Texture.pxFactor;
 	private static final float sH = tY + 64 * Texture.pxFactor;
@@ -19,7 +19,7 @@ public class EndGameVictory implements IForma {
 	
 	private float visible = 0;
 	
-	public EndGameVictory(float x, float y) {
+	public EndGameVitoria2(float x, float y) {
 		this.x = x;
 		this.y = y;
 	}

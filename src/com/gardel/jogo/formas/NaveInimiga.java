@@ -2,7 +2,11 @@ package com.gardel.jogo.formas;
 
 import static org.lwjgl.opengl.GL11.*;
 
+import com.gardel.Jogo;
 import com.gardel.jogo.collision.Collidable;
+import com.gardel.jogo.manager.EntityManager;
+import com.gardel.jogo.math.Mathf;
+import com.gardel.jogo.sound.SoundManager;
 import com.gardel.jogo.texture.Texture;
 
 public class NaveInimiga extends Collidable implements IForma{
@@ -14,11 +18,15 @@ public class NaveInimiga extends Collidable implements IForma{
 	
 	private static final int SIZE = 50;
 	
+	private float dx = 0;
 	private float frame = 0;
+	
+	private int shoot_delay = 0;
 	
 	public NaveInimiga(float x, float y) {
 		this.x = x;
 		this.y = y;
+		this.dx = Mathf.randomVal(-2f,2f);
 		setRaio(20);
 	}
 	
@@ -44,11 +52,33 @@ public class NaveInimiga extends Collidable implements IForma{
 	}
 
 	public IForma update() {
-		
+		y+=2;
+		if(x + dx - SIZE < 0 || x + dx + SIZE > Jogo.WIDTH) {
+			dx = -dx;
+		}
+		x+=dx;
 		frame += 6.0f/18.0;
 		
 		if(frame >= MAX_FRAMES) {
 			frame = 0;
+		}
+		
+		float px = EntityManager.getInstance().getJogador().getX();
+		
+		if(x > px - SIZE && x <= px + SIZE) {
+			if(shoot_delay == 0) {
+				shoot_delay = 120;
+				SoundManager.SOUND_LASER.play();
+				EntityManager.getInstance().add(new LaserInimigo(x, y + SIZE));
+			}
+		}
+		
+		if(shoot_delay > 0) {
+			shoot_delay--;
+		}
+		
+		if(this.y - SIZE > Jogo.HEIGHT) {
+			EntityManager.getInstance().remove(this);
 		}
 		
 		return this;
@@ -56,5 +86,16 @@ public class NaveInimiga extends Collidable implements IForma{
 	
 	public int getTextureSheet() {
 		return 1;
+	}
+
+	@Override
+	public void onCollideWith(Collidable c) {
+		if(c instanceof NaveInimiga) {
+			EntityManager.getInstance().remove((IForma) c);
+			EntityManager.getInstance().remove(this);
+			EntityManager.getInstance().add(new Explosao(c.getX(), c.getY()));
+			EntityManager.getInstance().add(new Explosao(x, y));
+			SoundManager.SOUND_EXPLOSION_2.play();
+		}
 	}
 }

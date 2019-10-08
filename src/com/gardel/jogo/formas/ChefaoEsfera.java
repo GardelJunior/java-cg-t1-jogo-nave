@@ -8,7 +8,7 @@ import com.gardel.jogo.math.Mathf;
 import com.gardel.jogo.sound.SoundManager;
 import com.gardel.jogo.texture.Texture;
 
-public class EsferaChefao extends Collidable implements IForma {
+public class ChefaoEsfera extends Collidable implements IForma {
 	
 	private static final float tW = 26 * Texture.pxFactor2;
 	private static final float tH = 26 * Texture.pxFactor2;
@@ -17,26 +17,26 @@ public class EsferaChefao extends Collidable implements IForma {
 	private static final int SIZE = 48;
 	
 	private float vida = 10;
-	private float speed = 6;
+	private float speed = 10;
 	private float xScale = 1;
 	private float frame = 0;
 	
 	private int deathAnimation = 240;
 	
-	private Chefao chefao;
+	private ChefaoCorpo chefao;
 	
 	private float shake = 0;
 	
 	public boolean destruida = false;
 	
-	public EsferaChefao(Chefao chefao, boolean esq) {
+	public ChefaoEsfera(ChefaoCorpo chefao, boolean esq) {
 		setRaio(20);
 		this.chefao = chefao;
 		if(esq) {
-			this.x = chefao.getX() - Chefao.getSize();
+			this.x = chefao.getX() - ChefaoCorpo.getSize();
 			this.xScale = -1;
 		}else {
-			this.x = chefao.getX() + Chefao.getSize();
+			this.x = chefao.getX() + ChefaoCorpo.getSize();
 		}
 		this.y = chefao.getY() + SIZE/2;
 	}

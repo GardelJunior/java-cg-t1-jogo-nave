@@ -2,16 +2,14 @@ package com.gardel.jogo.formas;
 
 import static org.lwjgl.opengl.GL11.*;
 
-import com.gardel.jogo.math.Mathf;
 import com.gardel.jogo.texture.Texture;
 
-public class BarraVida implements IForma {
+public class BarraCarregando implements IForma {
 
 	private float x,y;
 	
 	private float max;
 	private float current;
-	private float current_to;
 	
 	private boolean show = false;
 	
@@ -21,19 +19,17 @@ public class BarraVida implements IForma {
 	private static final int SIZE_INNER_X = SIZE_BORDER_X - 2;
 	private static final int SIZE_INNER_Y = SIZE_BORDER_Y - 2;
 	
-	public BarraVida(float x, float y, float max, float current) {
+	public BarraCarregando(float x, float y, float max, float current) {
 		this.x = x;
 		this.y = y;
 		this.max = max;
 		this.current = current;
-		this.current_to = current;
 	}
 
 	@Override
 	public IForma render() {
 		if(!show) return this;
-		float percent_g = 2 * (1 - current_to/max);
-		float percent_r = 2 * (1 - current/max);
+		float percent = 2 * (1 - current/max);
 		glPushMatrix();
 			Texture.unbind();
 			glTranslatef(x, y, 0);
@@ -50,18 +46,12 @@ public class BarraVida implements IForma {
 				glVertex2f(-SIZE_INNER_X,  SIZE_INNER_Y);
 				glVertex2f( SIZE_INNER_X,  SIZE_INNER_Y);
 				glVertex2f( SIZE_INNER_X, -SIZE_INNER_Y);
-				/* Preenchimento sombra vida */
-				glColor3f(1, 0, 0);
+				/* Preenchimento porcentagem */
+				glColor3f(1, 1, 1);
 				glVertex2f(-SIZE_INNER_X, -SIZE_INNER_Y);
 				glVertex2f(-SIZE_INNER_X,  SIZE_INNER_Y);
-				glVertex2f(SIZE_INNER_X - SIZE_INNER_X * percent_r,  SIZE_INNER_Y);
-				glVertex2f(SIZE_INNER_X - SIZE_INNER_X * percent_r, -SIZE_INNER_Y);
-				/* Preenchimento vida */
-				glColor3f(0, 1, 0);
-				glVertex2f(-SIZE_INNER_X, -SIZE_INNER_Y);
-				glVertex2f(-SIZE_INNER_X,  SIZE_INNER_Y);
-				glVertex2f(SIZE_INNER_X - SIZE_INNER_X * percent_g,  SIZE_INNER_Y);
-				glVertex2f(SIZE_INNER_X - SIZE_INNER_X * percent_g, -SIZE_INNER_Y);
+				glVertex2f(SIZE_INNER_X - SIZE_INNER_X * percent,  SIZE_INNER_Y);
+				glVertex2f(SIZE_INNER_X - SIZE_INNER_X * percent, -SIZE_INNER_Y);
 			glEnd();
 		glPopMatrix();
 		return this;
@@ -69,7 +59,6 @@ public class BarraVida implements IForma {
 
 	@Override
 	public IForma update() {
-		current = Mathf.lerp(current, current_to, 0.1f);
 		return this;
 	}
 
@@ -98,11 +87,11 @@ public class BarraVida implements IForma {
 	}
 
 	public float getCurrent() {
-		return current_to;
+		return current;
 	}
 
 	public void setCurrent(float current) {
-		this.current_to = current;
+		this.current = current;
 	}
 	
 	public boolean isVisible() {

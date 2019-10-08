@@ -14,6 +14,10 @@ public class Layer {
 		return formas.remove(f);
 	}
 	
+	public void clear() {
+		formas.clear();
+	}
+	
 	public void add(IForma f) {
 		formas.add(f);
 		formas.sort((IForma f1, IForma f2) -> f1.getTextureSheet()-f2.getTextureSheet());

@@ -7,6 +7,7 @@ import java.util.List;
 import com.gardel.jogo.texture.Texture;
 
 public class TextureManager {
+	
 	private static TextureManager instance;
 	
 	public static TextureManager getInstance() {

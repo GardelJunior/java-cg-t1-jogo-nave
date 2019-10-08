@@ -16,7 +16,7 @@ public class Jogo {
 	public static final int WIDTH = 600,HEIGHT = 800;
 	
 	public static long janela;
-	private EntityManager em;
+	private EntityManager entityManager;
 	
 	public Jogo() {}
 	
@@ -34,15 +34,23 @@ public class Jogo {
 		TextureManager.getInstance().loadTexture("sprite_sheet", "/sprite_sheet.png");
 		TextureManager.getInstance().loadTexture("boss_sheet", "/boss_sheet.png");
 		
-		SoundManager.SOUND_EXPLOSION_1 	= new SoundSource(SoundManager.loadWaveSound("/explosion.wav"));
-		SoundManager.SOUND_EXPLOSION_2 	= new SoundSource(SoundManager.loadWaveSound("/explosion2.wav"));
-		SoundManager.SOUND_EXPLOSION_P 	= new SoundSource(SoundManager.loadWaveSound("/explosion_player.wav"));
-		SoundManager.SOUND_EXPLOSION_BIG 	= new SoundSource(SoundManager.loadWaveSound("/explosion_big.wav"));
-		SoundManager.SOUND_HIT				= new SoundSource(SoundManager.loadWaveSound("/hit.wav"));
-		SoundManager.SOUND_LASER			= new SoundSource(SoundManager.loadWaveSound("/laser.wav"));
-		SoundManager.SOUND_ATTACK			= new SoundSource(SoundManager.loadWaveSound("/attack.wav"));
+		SoundManager.SOUND_EXPLOSION_1 	= new SoundSource(SoundManager.loadOggSound("/explosion.ogg"));
+		SoundManager.SOUND_EXPLOSION_2 	= new SoundSource(SoundManager.loadOggSound("/explosion2.ogg"));
+		SoundManager.SOUND_EXPLOSION_P 	= new SoundSource(SoundManager.loadOggSound("/explosion_player.ogg"));
+		SoundManager.SOUND_EXPLOSION_BIG 	= new SoundSource(SoundManager.loadOggSound("/explosion_big.ogg"));
+		SoundManager.SOUND_HIT				= new SoundSource(SoundManager.loadOggSound("/hit.ogg"));
+		SoundManager.SOUND_LASER			= new SoundSource(SoundManager.loadOggSound("/laser.ogg"));
+		SoundManager.SOUND_ATTACK			= new SoundSource(SoundManager.loadOggSound("/attack.ogg"));
+		SoundManager.MUSIC_1				= new SoundSource(SoundManager.loadOggSound("/soundtrack1.ogg"));
+		SoundManager.MUSIC_2				= new SoundSource(SoundManager.loadOggSound("/soundtrack2.ogg"));
+		SoundManager.MUSIC_3				= new SoundSource(SoundManager.loadOggSound("/soundtrack3.ogg"));
 		
-		em = EntityManager.getInstance();
+		entityManager = EntityManager.getInstance();
+		SoundManager.MUSIC_1.setVolume(0.8f);
+		SoundManager.MUSIC_2.setVolume(0.85f);
+		SoundManager.MUSIC_3.setVolume(0.8f);
+		
+		entityManager.startLevel();
 	}
 	
 	public void reshape(int width, int height) {
@@ -55,13 +63,13 @@ public class Jogo {
 	}
 	
 	public void display() {
-		em.update();
-		em.render();
+		entityManager.update();
+		entityManager.render();
 	}
 	
 	public void keyEvent(int key, int action) {
 		if(action > 1) action = 1;
-		em.onKeyEvent(key, action); //Avisa ao jogador que uma tecla foi pressionada/solta
+		entityManager.onKeyEvent(key, action); //Avisa ao jogador que uma tecla foi pressionada/solta
 	}
 	
 	public void gameloop() throws Exception {

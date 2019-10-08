@@ -1,6 +1,7 @@
 package com.gardel.jogo.sound;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -15,6 +16,9 @@ import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.ALCCapabilities;
 
+import com.gardel.jogo.sound.ogg.OggData;
+import com.gardel.jogo.sound.ogg.OggDecoder;
+
 public class SoundManager {
 	
 	public static SoundSource SOUND_LASER;
@@ -25,6 +29,9 @@ public class SoundManager {
 	public static SoundSource SOUND_HIT;
 	public static SoundSource SOUND_ATTACK;
 	
+	public static SoundSource MUSIC_1;
+	public static SoundSource MUSIC_2;
+	public static SoundSource MUSIC_3;
 	
 	private static long device;
 	private static long context;
@@ -57,6 +64,19 @@ public class SoundManager {
 			AudioInputStream fis = AudioSystem.getAudioInputStream(new File("./resources/audio" + file));
 			WaveData wave = WaveData.create(fis); //Lê o arquivo de audio
 			AL10.alBufferData(buffer, wave.format, wave.data, wave.samplerate); //Coloca o audio no buffer.
+			sound_list.add(buffer); //Adiciona o buffer na lista de áudios
+			return buffer;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
+	public static int loadOggSound(String file) {
+		try {
+			int buffer = AL10.alGenBuffers(); //Aloca um buffer de áudio e retorna o endr.
+			OggData data = new OggDecoder().getData(new FileInputStream(new File("./resources/audio" + file)));
+			AL10.alBufferData(buffer, data.channels, data.data, data.rate); //Coloca o audio no buffer.
 			sound_list.add(buffer); //Adiciona o buffer na lista de áudios
 			return buffer;
 		} catch (Exception e) {

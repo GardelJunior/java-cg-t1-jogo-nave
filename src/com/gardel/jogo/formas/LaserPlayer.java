@@ -17,7 +17,7 @@ public class LaserPlayer extends Collidable implements IForma{
 	private static final float sW = tX + 32 * Texture.pxFactor;
 	private static final float sH = 32 * Texture.pxFactor;
 	
-	private float vy = -10f;
+	private float vy = -15f;
 	
 	public LaserPlayer(float x, float y) {
 		this.x = x;
