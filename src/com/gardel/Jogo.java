@@ -7,9 +7,15 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 
 import com.gardel.jogo.manager.EntityManager;
+import com.gardel.jogo.manager.RenderManager;
+import com.gardel.jogo.manager.StateManager;
 import com.gardel.jogo.manager.TextureManager;
 import com.gardel.jogo.sound.SoundManager;
 import com.gardel.jogo.sound.SoundSource;
+import com.gardel.jogo.states.EstadoChefao;
+import com.gardel.jogo.states.EstadoVitoria;
+import com.gardel.jogo.states.EstadoEarlyGame;
+import com.gardel.jogo.states.EstadoDerrota;
 
 public class Jogo {
 	
@@ -17,6 +23,8 @@ public class Jogo {
 	
 	public static long janela;
 	private EntityManager entityManager;
+	private RenderManager renderManager;
+	private StateManager stateManager;
 	
 	public Jogo() {}
 	
@@ -46,11 +54,19 @@ public class Jogo {
 		SoundManager.MUSIC_3				= new SoundSource(SoundManager.loadOggSound("/soundtrack3.ogg"));
 		
 		entityManager = EntityManager.getInstance();
+		renderManager = RenderManager.getInstance();
+		stateManager = StateManager.getInstance();
+		
+		stateManager.registerState("inicial", new EstadoEarlyGame());
+		stateManager.registerState("chefao", new EstadoChefao());
+		stateManager.registerState("vitoria", new EstadoVitoria());
+		stateManager.registerState("derrota", new EstadoDerrota());
+		
+		stateManager.setState("inicial");
+		
 		SoundManager.MUSIC_1.setVolume(0.8f);
 		SoundManager.MUSIC_2.setVolume(0.85f);
 		SoundManager.MUSIC_3.setVolume(0.8f);
-		
-		entityManager.startLevel();
 	}
 	
 	public void reshape(int width, int height) {
@@ -64,12 +80,14 @@ public class Jogo {
 	
 	public void display() {
 		entityManager.update();
-		entityManager.render();
+		stateManager.update();
+		renderManager.updateAndRender();
 	}
 	
 	public void keyEvent(int key, int action) {
 		if(action > 1) action = 1;
 		entityManager.onKeyEvent(key, action); //Avisa ao jogador que uma tecla foi pressionada/solta
+		stateManager.onKeyEvent(key, action);
 	}
 	
 	public void gameloop() throws Exception {

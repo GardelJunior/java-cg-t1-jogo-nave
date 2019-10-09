@@ -1,9 +1,10 @@
-package com.gardel.jogo.formas;
+package com.gardel.jogo.formas.entidades;
 
 import static org.lwjgl.opengl.GL11.*;
 
 import com.gardel.Jogo;
 import com.gardel.jogo.collision.Collidable;
+import com.gardel.jogo.formas.IForma;
 import com.gardel.jogo.manager.EntityManager;
 import com.gardel.jogo.sound.SoundManager;
 import com.gardel.jogo.texture.Texture;

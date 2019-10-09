@@ -6,7 +6,7 @@ import java.util.Random;
 
 import com.gardel.jogo.texture.Texture;
 
-public class Estrelas {
+public class Estrelas implements IForma {
 	private final int SIZE = 100;
 	private Estrela[] pontos = new Estrela[SIZE]; //100 Estrelas
 	private float velocity = 1;
@@ -28,7 +28,7 @@ public class Estrelas {
 		}
 	}
 	
-	public void update() {
+	public IForma update() {
 		for(int i = 0 ; i < SIZE ; i++) {
 			pontos[i].y += pontos[i].yVel * velocity;
 			boolean pA = pontos[i].y > height + velocity;
@@ -48,9 +48,10 @@ public class Estrelas {
 				}
 			}
 		}
+		return this;
 	}
 	
-	public void render() {
+	public IForma render() {
 		Texture.unbind();
 		if(velocity > 1f || velocity < -1f) {
 			glBegin(GL_LINES);
@@ -68,6 +69,7 @@ public class Estrelas {
 				}
 			glEnd();
 		}
+		return this;
 	}
 
 	public float getVelocity() {

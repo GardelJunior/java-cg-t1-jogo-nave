@@ -1,41 +1,36 @@
-package com.gardel.jogo.formas;
+package com.gardel.jogo.formas.entidades;
 
 import static org.lwjgl.opengl.GL11.*;
 
 import com.gardel.jogo.collision.Collidable;
+import com.gardel.jogo.formas.IForma;
 import com.gardel.jogo.manager.EntityManager;
-import com.gardel.jogo.math.Mathf;
 import com.gardel.jogo.sound.SoundManager;
 import com.gardel.jogo.texture.Texture;
 
-public class ChefaoEscudo implements IForma{
+public class LaserPlayer extends Collidable implements IForma{
 
 	private static final int SIZE = 40;
 	
-	private static final float tX = 65 * Texture.pxFactor;
-	private static final float tY = 127 * Texture.pxFactor;
+	private static final float tX = 129 * Texture.pxFactor;
+	private static final float tY = 0;
 	
-	private static final float sW = tX + 128 * Texture.pxFactor;
-	private static final float sH = tY + 128 * Texture.pxFactor;
+	private static final float sW = tX + 32 * Texture.pxFactor;
+	private static final float sH = 32 * Texture.pxFactor;
 	
-	private float alpha = 1;
-	private float shake;
+	private float vy = -15f;
 	
-	private float x,y;
-	
-	public ChefaoEscudo(float x, float y, float shake) {
+	public LaserPlayer(float x, float y) {
 		this.x = x;
 		this.y = y;
-		this.shake = shake;
+		setRaio(20);
 	}
 	
 	@Override
 	public IForma render() {
-		int rAng = Mathf.randomInRangei(0, 360);
+		glColor3f(0, 0, 1);
 		glPushMatrix();
-			glColor4f(1, 1, 1,alpha);
-			glTranslatef(x + Mathf.lengthdir_x(shake, rAng), y + Mathf.lengthdir_y(shake, rAng), 0);
-			glScalef(5, 5, 5);
+			glTranslatef(x+3, y, 0);
 			glBegin(GL_QUADS);
 				glTexCoord2f(tX, sH);
 				glVertex2f(-SIZE,  SIZE);
@@ -53,12 +48,10 @@ public class ChefaoEscudo implements IForma{
 
 	@Override
 	public IForma update() {
-		if(alpha <= 0f) {
+		this.y += vy;
+		if(this.y + SIZE < 0) {
 			EntityManager.getInstance().remove(this);
-		}else {
-			alpha *= 0.95555f;
 		}
-		shake *= 0.9f;
 		return this;
 	}
 

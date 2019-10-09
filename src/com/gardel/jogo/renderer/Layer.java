@@ -23,7 +23,7 @@ public class Layer {
 		formas.sort((IForma f1, IForma f2) -> f1.getTextureSheet()-f2.getTextureSheet());
 	}
 	
-	public void render() {
+	public void updateAndRender() {
 		for(int i = 0 ; i < formas.size() ; i++) {
 			formas.get(i).update().bindTexture().render();
 		}
